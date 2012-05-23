@@ -1,8 +1,0 @@
-Inputs to add
-
-Cameria Position and Setup?
-
-
-Flip Volumes ? 
-
-Default _min thresholds for fibers

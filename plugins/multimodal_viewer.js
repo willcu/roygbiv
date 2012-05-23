@@ -358,46 +358,49 @@ MultiModalViewerPlugin.prototype.loadVolume = function(files){
 MultiModalViewerPlugin.prototype.loadSurface = function(files){
 	console.log(files)
 	var surfaceObj = new Object();
-	surfaceObj["name"] = files[0];
-	surfaceObj["surface"] = new X.object();
-	if(typeof files[1] == "string"){
-		surfaceObj["surface"].load(files[1]);
-	}else{
-		//Do local File Support Here
-		this.readFile(files[1], surfaceObj["surface"]);
-	}
-	var curveData = files.slice(2);
-	console.log(curveData);
-	if(curveData.length >= 2){
-		surfaceObj["curves"] = new Object();
-		surfaceObj["curveTypes"] = new Array();
-		for(var i=0; i<curveData.length; i=i+2){
-			if(typeof curveData[i+1] == "string"){
-				surfaceObj["curves"][curveData[i]] = curveData[i+1];
-				surfaceObj["curveTypes"].push(curveData[i])
-			}else{
-				//Local File Support Goes here
-				var curve = new X.scalars();
-				this.readFile(files[i+1], curve);
-				surfaceObj["curves"][curveData[i]] = curve;
-				surfaceObj["curveTypes"].push(curveData[i])
-			}
-		}	
-	}
-	
-	surfaceObj["surface"].transform().rotateY(90);
-    if(surfaceObj.curves != undefined){
-    	surfaceObj["surface"].setScalars(surfaceObj["curves"][surfaceObj["curveTypes"][0]]);
-		var Loader = function() {
-			// default type
-			this[surfaceObj.name] = surfaceObj["curveTypes"][0]; 
+	if(files[0] != ""){
+		surfaceObj["name"] = files[0];
+		surfaceObj["surface"] = new X.object();
+		if(typeof files[1] == "string"){
+			surfaceObj["surface"].load(files[1]);
+		}else{
+			//Do local File Support Here
+			this.readFile(files[1], surfaceObj["surface"]);
 		}
-		surfaceObj["loader"]  = new Loader();
+		var curveData = files.slice(2);
+		console.log(curveData);
+		if(curveData.length >= 2){
+			surfaceObj["curves"] = new Object();
+			surfaceObj["curveTypes"] = new Array();
+			for(var i=0; i<curveData.length; i=i+2){
+				if(curveData[i] != ""){
+					if(typeof curveData[i+1] == "string"){
+						surfaceObj["curves"][curveData[i]] = curveData[i+1];
+						surfaceObj["curveTypes"].push(curveData[i])
+					}else{
+						//Local File Support Goes here
+						var curve = new X.scalars();
+						this.readFile(files[i+1], curve);
+						surfaceObj["curves"][curveData[i]] = curve;
+						surfaceObj["curveTypes"].push(curveData[i])
+					}
+				}
+			}	
+		}
+		
+		surfaceObj["surface"].transform().rotateY(90);
+		if(surfaceObj.curves != undefined){
+			surfaceObj["surface"].setScalars(surfaceObj["curves"][surfaceObj["curveTypes"][0]]);
+			var Loader = function() {
+				// default type
+				this[surfaceObj.name] = surfaceObj["curveTypes"][0]; 
+			}
+			surfaceObj["loader"]  = new Loader();
+		}
+		surfaceObj["surface"].setOpacity(0.7);
+		this.xObjs["surfaces"].push(surfaceObj);
+		this.renderer.add(surfaceObj["surface"]);
 	}
-	surfaceObj["surface"].setOpacity(0.7);
-	this.xObjs["surfaces"].push(surfaceObj);
-    this.renderer.add(surfaceObj["surface"]);
-
 }
 
 
